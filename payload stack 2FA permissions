@@ -1,0 +1,26 @@
+<html>
+<body>
+    <h1>Enable two-factor authentication</h1>
+    <form method="post">
+        <img src="@ViewBag.BarcodeImageUrl" /><br/>
+        Setup code: @ViewBag.SetupCode<br/>
+        Input security code: <input name="inputCode" /><br/>
+        <input type="submit" />
+    </form>
+</body>
+</html>
+[HttpPost]
+public ActionResult Enable(string inputCode)
+{
+    User user = // TODO: fetch signed in user from a database
+    TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
+    bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(user), inputCode);
+    if (!isValid)
+    {
+        return Redirect("/twofactorauthentication/enable");
+    }
+
+    user.TwoFactorEnabled = true;
+    // TODO: store the updated user in database
+    return Redirect("/");
+}
